@@ -13,7 +13,7 @@ from snow_checker import load_forecast, to_table, will_it_snow_between
 st.set_page_config(
     page_title="Laurins Schneevorhersage",
     page_icon="❄️",
-    layout="centered",
+    layout="wide",   # ← WICHTIG
 )
 
 
