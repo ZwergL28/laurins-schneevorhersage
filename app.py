@@ -116,6 +116,8 @@ def ensure_state_defaults() -> None:
         st.session_state.place_name = "Bettingen (BS)"
     if "map_fullscreen" not in st.session_state:
         st.session_state.map_fullscreen = False
+    if "result" not in st.session_state:
+        st.session_state.result = None
     if "scroll_to_result" not in st.session_state:
         st.session_state.scroll_to_result = False
 
@@ -197,7 +199,7 @@ if st.button("❄️ Schneevorhersage berechnen"):
             df, str(start_date), str(end_date)
         )
 
-    # Ergebnisse speichern
+    # Ergebnis speichern
     st.session_state.result = {
         "will_snow": will_snow,
         "total_snow_cm": total_snow_cm,
@@ -205,8 +207,44 @@ if st.button("❄️ Schneevorhersage berechnen"):
         "window": window,
     }
 
-    # Scroll-Flag setzen
     st.session_state.scroll_to_result = True
-
-    # WICHTIG: Neu rendern
     st.rerun()
+
+if st.session_state.result is not None:
+
+    st.markdown("<div id='result'></div>", unsafe_allow_html=True)
+
+    st.markdown("## ❄️ Ergebnis der Schneevorhersage")
+
+    result = st.session_state.result
+
+    if result["will_snow"]:
+        st.success(
+            f"❄️ Ja – es wird schneien. "
+            f"Erwartete Menge: {result['total_snow_cm']:.2f} cm"
+        )
+        st.dataframe(
+            result["snow_hours"][["time", "snowfall_cm", "temp_c"]],
+            use_container_width=True
+        )
+    else:
+        st.warning("🌧️ Nein – laut Vorhersage kein Schneefall in diesem Zeitraum.")
+
+    st.caption("Hinweis: Vorhersagen werden unsicherer, je weiter sie in der Zukunft liegen.")
+    st.dataframe(
+        result["window"][["time", "snowfall_cm", "temp_c", "precip_mm"]],
+        use_container_width=True
+    )
+
+    # Auto-Scroll (JETZT existiert das Element!)
+    if st.session_state.scroll_to_result:
+        st.markdown(
+            """
+            <script>
+            document.getElementById("result")
+              .scrollIntoView({behavior: "smooth"});
+            </script>
+            """,
+            unsafe_allow_html=True
+        )
+        st.session_state.scroll_to_result = False
