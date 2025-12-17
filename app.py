@@ -83,9 +83,6 @@ def ensure_state_defaults() -> None:
         st.session_state.lon = 7.66
     if "place_name" not in st.session_state:
         st.session_state.place_name = "Bettingen (BS)"
-    if "map_fullscreen" not in st.session_state:
-        st.session_state.map_fullscreen = False
-
 
 def on_place_change() -> None:
     lat, lon = PLACES[st.session_state.place_name]
@@ -100,14 +97,8 @@ def draw_clickable_map() -> None:
         st.session_state.lat = previous["last_clicked"]["lat"]
         st.session_state.lon = previous["last_clicked"]["lng"]
 
-    # Nur die Karte wird "fullscreen" (hoch), nicht die ganze App
-    map_height = 850 if st.session_state.map_fullscreen else 450
-    zoom = 10 if st.session_state.map_fullscreen else 11
-
     m = folium.Map(
-        location=[st.session_state.lat, st.session_state.lon],
-        zoom_start=zoom,
-        control_scale=True,
+        location=[st.session_state.lat, st.session_state.lon]
     )
 
     folium.Marker(
@@ -137,17 +128,8 @@ st.selectbox(
     on_change=on_place_change,
 )
 
-# Checkbox direkt über der Karte
-st.checkbox("Karte gross anzeigen", key="map_fullscreen")
-
-# Optional: Rest einklappen, damit es sich wie „Kartenmodus“ anfühlt
-with st.expander("Infos (einklappen für mehr Platz)", expanded=not st.session_state.map_fullscreen):
-    st.write(f"Aktueller Ort (Koordinaten): {st.session_state.lat:.5f}, {st.session_state.lon:.5f}")
-    st.write("Tipp: Im grossen Kartenmodus kannst du besser zoomen und einen Punkt genau treffen.")
-
 # Karte
 st.subheader("Ort auf der Karte anklicken (Single-Click)")
-draw_clickable_map()
 
 # Forecast
 if st.button("❄️Schneevorhersage berechnen"):
