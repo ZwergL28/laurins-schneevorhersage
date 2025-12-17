@@ -46,7 +46,8 @@ PLACES = {
     "Grindelwald": (46.624, 8.035),
     "Hasliberg": (46.757, 8.151),
     "St. Moritz": (46.498, 9.839),
-    "Innsbruck": (47.265, 11.393)
+    "Innsbruck": (47.265, 11.393),
+    "St. Gallen": (47.424, 9.375)
 }
 
 
