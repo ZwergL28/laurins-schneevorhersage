@@ -116,6 +116,8 @@ def ensure_state_defaults() -> None:
         st.session_state.place_name = "Bettingen (BS)"
     if "map_fullscreen" not in st.session_state:
         st.session_state.map_fullscreen = False
+    if "scroll_to_result" not in st.session_state:
+        st.session_state.scroll_to_result = False
 
 
 def on_place_change() -> None:
@@ -187,7 +189,6 @@ st.markdown("<div id='result'></div>", unsafe_allow_html=True)
 
 # ---------- BUTTON ----------
 if st.button("❄️ Schneevorhersage berechnen"):
-
     with st.spinner("Berechne Schneevorhersage…"):
         data = load_forecast(st.session_state.lat, st.session_state.lon)
         df = to_table(data)
@@ -196,30 +197,16 @@ if st.button("❄️ Schneevorhersage berechnen"):
             df, str(start_date), str(end_date)
         )
 
-    # ---------- AUTO-SCROLL ZUM ERGEBNIS ----------
-    st.markdown(
-        """
-        <script>
-        document.getElementById("result").scrollIntoView({behavior: "smooth"});
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
+    # Ergebnisse speichern
+    st.session_state.result = {
+        "will_snow": will_snow,
+        "total_snow_cm": total_snow_cm,
+        "snow_hours": snow_hours,
+        "window": window,
+    }
 
-    # ---------- SICHTBARE ÜBERSCHRIFT ----------
-    st.markdown("## ❄️ Ergebnis der Schneevorhersage")
+    # Scroll-Flag setzen
+    st.session_state.scroll_to_result = True
 
-    if will_snow:
-        st.success(f"❄️ Ja – es wird schneien. Erwartete Menge: {total_snow_cm:.2f} cm")
-        st.dataframe(
-            snow_hours[["time", "snowfall_cm", "temp_c"]],
-            use_container_width=True
-        )
-    else:
-        st.warning("🌧️ Nein – laut Vorhersage kein Schneefall in diesem Zeitraum.")
-
-    st.caption("Hinweis: Vorhersagen werden unsicherer, je weiter sie in der Zukunft liegen.")
-    st.dataframe(
-        window[["time", "snowfall_cm", "temp_c", "precip_mm"]],
-        use_container_width=True
-    )
+    # WICHTIG: Neu rendern
+    st.rerun()
