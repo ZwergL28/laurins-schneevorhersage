@@ -96,4 +96,76 @@ st.write(
 )
 
 # Zeitraum
-start_date = st._
+start_date = st.date_input("Startdatum", value=pd.to_datetime("2025-12-16").date())
+end_date = st.date_input("Enddatum", value=pd.to_datetime("2025-12-25").date())
+
+# Ort
+st.selectbox(
+    "Ort auswählen",
+    list(PLACES.keys()),
+    key="place_name",
+    on_change=on_place_change,
+)
+
+# Karte
+st.subheader("Ort auf der Karte anklicken")
+m = folium.Map(
+    location=[st.session_state.lat, st.session_state.lon],
+    zoom_start=11,
+    control_scale=True,
+)
+
+folium.Marker(
+    [st.session_state.lat, st.session_state.lon],
+    tooltip="Gewählter Ort",
+).add_to(m)
+
+map_data = st_folium(m, height=500)
+
+if map_data and map_data.get("last_clicked"):
+    st.session_state.lat = map_data["last_clicked"]["lat"]
+    st.session_state.lon = map_data["last_clicked"]["lng"]
+
+st.write(
+    f"Aktuelle Koordinaten: "
+    f"{st.session_state.lat:.5f}, {st.session_state.lon:.5f}"
+)
+
+
+# --------------------------------------------------
+# FORECAST
+# --------------------------------------------------
+st.divider()
+
+if st.button("❄️ Schneevorhersage berechnen"):
+    with st.spinner("Berechne Vorhersage…"):
+        data = load_forecast(st.session_state.lat, st.session_state.lon)
+        df = to_table(data)
+
+        will_snow, total_snow_cm, snow_hours, window = will_it_snow_between(
+            df, str(start_date), str(end_date)
+        )
+
+    st.subheader("Ergebnis")
+
+    if will_snow:
+        st.success(
+            f"❄️ Ja – es wird schneien. "
+            f"Erwartete Schneemenge: {total_snow_cm:.2f} cm"
+        )
+        st.dataframe(
+            snow_hours[["time", "snowfall_cm", "temp_c"]],
+            use_container_width=True,
+        )
+    else:
+        st.warning("🌧️ Nein – laut Vorhersage kein Schneefall in diesem Zeitraum.")
+
+    st.caption(
+        "Hinweis: Wettervorhersagen werden unsicherer, "
+        "je weiter sie in der Zukunft liegen."
+    )
+
+    st.dataframe(
+        window[["time", "snowfall_cm", "temp_c", "precip_mm"]],
+        use_container_width=True,
+    )
