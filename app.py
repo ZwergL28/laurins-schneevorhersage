@@ -142,13 +142,12 @@ st.selectbox(
 st.subheader("Ort auf der Karte anklicken (Single-Click)")
 draw_clickable_map()
 
-# Checkbox direkt über der Karte
+# Checkbox direkt unter der Karte
 st.checkbox("Karte gross anzeigen", key="map_fullscreen")
 
 # Optional: Rest einklappen, damit es sich wie „Kartenmodus“ anfühlt
 with st.expander("Infos (einklappen für mehr Platz)", expanded=not st.session_state.map_fullscreen):
     st.write(f"Aktueller Ort (Koordinaten): {st.session_state.lat:.5f}, {st.session_state.lon:.5f}")
-    st.write("Tipp: Im grossen Kartenmodus kannst du besser zoomen und einen Punkt genau treffen.")
 
 # Forecast
 if st.button("Vorhersage prüfen"):
