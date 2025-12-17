@@ -55,11 +55,12 @@ def set_background(image_file: str) -> None:
             background-position: center;
             background-attachment: fixed;
         }}
+       
+       
         .block-container {{
             background: rgba(255,255,255,0.88);
             border-radius: 16px;
             padding: 1.5rem;
-            max-width: 900px;
         }}
         </style>
         """,
