@@ -180,19 +180,104 @@ with st.expander("Infos (einklappen für mehr Platz)", expanded=not st.session_s
     st.write(f"Aktueller Ort (Koordinaten): {st.session_state.lat:.5f}, {st.session_state.lon:.5f}")
 
 # Forecast
-if st.button("Vorhersage prüfen"):
-    data = load_forecast(st.session_state.lat, st.session_state.lon)
-    df = to_table(data)
+# ---------- ANKER OBEN (für "Zurück zur Karte") ----------
+st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 
-    will_snow, total_snow_cm, snow_hours, window = will_it_snow_between(
-        df, str(start_date), str(end_date)
+# ---------- BUTTON ----------
+if st.button("❄️ Schneevorhersage berechnen"):
+
+    with st.spinner("Berechne Schneevorhersage…"):
+        data = load_forecast(st.session_state.lat, st.session_state.lon)
+        df = to_table(data)
+
+        will_snow, total_snow_cm, snow_hours, window = will_it_snow_between(
+            df, str(start_date), str(end_date)
+        )
+
+    # ---------- ANKER FÜR ERGEBNIS ----------
+    st.markdown("<div id='result'></div>", unsafe_allow_html=True)
+
+    # ---------- AUTO-SCROLL ZUM ERGEBNIS ----------
+    st.markdown(
+        """
+        <script>
+        document.getElementById("result").scrollIntoView({behavior: "smooth"});
+        </script>
+        """,
+        unsafe_allow_html=True
     )
 
-    if will_snow:
-        st.success(f"Ja – Schneefall in der Vorhersage. Summe: {total_snow_cm:.2f} cm")
-        st.dataframe(snow_hours[["time", "snowfall_cm", "temp_c"]], use_container_width=True)
-    else:
-        st.warning("Nein – kein Schneefall (> 0 cm) in der Vorhersage für diesen Zeitraum.")
+    # ---------- ÜBERSCHRIFT ----------
+    st.markdown("## ❄️ Ergebnis der Schneevorhersage")
 
+    # ---------- ERGEBNIS-BOX ----------
+    if will_snow:
+        st.markdown(
+            f"""
+            <div style="
+                background:#e8f3ff;
+                border-radius:20px;
+                padding:1.5rem;
+                margin-top:1rem;
+                text-align:center;
+                font-size:1.25rem;
+                font-weight:700;
+            ">
+            ❄️ <strong>Ja, es wird schneien!</strong><br>
+            Erwartete Schneemenge: <strong>{total_snow_cm:.2f} cm</strong>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.dataframe(
+            snow_hours[["time", "snowfall_cm", "temp_c"]],
+            use_container_width=True
+        )
+
+    else:
+        st.markdown(
+            """
+            <div style="
+                background:#fff3e0;
+                border-radius:20px;
+                padding:1.5rem;
+                margin-top:1rem;
+                text-align:center;
+                font-size:1.25rem;
+                font-weight:700;
+            ">
+            🌧️ <strong>Kein Schneefall</strong><br>
+            Laut Vorhersage schneit es in diesem Zeitraum nicht.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ---------- DETAILS ----------
     st.caption("Hinweis: Vorhersagen werden unsicherer, je weiter sie in der Zukunft liegen.")
-    st.dataframe(window[["time", "snowfall_cm", "temp_c", "precip_mm"]], use_container_width=True)
+    st.dataframe(
+        window[["time", "snowfall_cm", "temp_c", "precip_mm"]],
+        use_container_width=True
+    )
+
+    # ---------- ZURÜCK-ZUR-KARTE BUTTON ----------
+    st.markdown(
+        """
+        <div style="text-align:center; margin-top:2rem;">
+            <a href="#top" style="
+                display:inline-block;
+                background:#1f77ff;
+                color:white;
+                padding:0.7rem 1.6rem;
+                border-radius:14px;
+                font-weight:700;
+                text-decoration:none;
+                font-size:1rem;
+            ">
+            ⬆️ Zurück zur Karte
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
