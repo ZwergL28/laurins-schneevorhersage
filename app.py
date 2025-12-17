@@ -6,6 +6,35 @@ from streamlit_folium import st_folium
 
 from snow_checker import load_forecast, to_table, will_it_snow_between
 
+st.set_page_config(
+    page_title="Laurins Schneevorhersage",
+    page_icon="❄️"
+)
+
+st.markdown(
+    """
+    <style>
+    /* Zentrierter blauer Hauptbutton */
+    div.stButton > button {
+        display: block;
+        margin: 2rem auto;
+        background-color: #1f77ff;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 0.6rem 2.2rem;
+        border-radius: 10px;
+        border: none;
+    }
+
+    div.stButton > button:hover {
+        background-color: #155edb;
+        color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 PLACES = {
     "Bettingen (BS)": (47.57, 7.66),
@@ -121,7 +150,7 @@ st.subheader("Ort auf der Karte anklicken (Single-Click)")
 draw_clickable_map()
 
 # Forecast
-if st.button("Vorhersage prüfen"):
+if st.button("❄️Schneevorhersage berechnen"):
     data = load_forecast(st.session_state.lat, st.session_state.lon)
     df = to_table(data)
 
@@ -130,7 +159,7 @@ if st.button("Vorhersage prüfen"):
     )
 
     if will_snow:
-        st.success(f"Ja – Schneefall in der Vorhersage. Summe: {total_snow_cm:.2f} cm")
+        st.success(f"Ja – Schneefall in der Vorhersage. ❄️: {total_snow_cm:.2f} cm")
         st.dataframe(snow_hours[["time", "snowfall_cm", "temp_c"]], use_container_width=True)
     else:
         st.warning("Nein – kein Schneefall (> 0 cm) in der Vorhersage für diesen Zeitraum.")
