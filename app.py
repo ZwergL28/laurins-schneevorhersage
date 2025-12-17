@@ -6,6 +6,36 @@ from streamlit_folium import st_folium
 
 from snow_checker import load_forecast, to_table, will_it_snow_between
 
+st.set_page_config(
+    page_title="Laurins Schneevorhersage",
+    page_icon="❄️",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
+
+st.markdown(
+    """
+    <style>
+    /* Grössere Touch-Ziele für Mobile */
+    button {
+        min-height: 48px;
+    }
+
+    /* Überschriften nicht zu breit */
+    h1, h2, h3 {
+        text-align: center;
+    }
+
+    /* Karte auf Mobile etwas höher */
+    @media (max-width: 600px) {
+        iframe {
+            height: 70vh !important;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 PLACES = {
     "Bettingen (BS)": (47.57, 7.66),
