@@ -84,6 +84,7 @@ def ensure_state_defaults() -> None:
     if "place_name" not in st.session_state:
         st.session_state.place_name = "Bettingen (BS)"
 
+
 def on_place_change() -> None:
     lat, lon = PLACES[st.session_state.place_name]
     st.session_state.lat = lat
@@ -91,14 +92,15 @@ def on_place_change() -> None:
 
 
 def draw_clickable_map() -> None:
-    # Klick-Daten aus dem letzten Render lesen
     previous = st.session_state.get("map")
     if previous and previous.get("last_clicked"):
         st.session_state.lat = previous["last_clicked"]["lat"]
         st.session_state.lon = previous["last_clicked"]["lng"]
 
     m = folium.Map(
-        location=[st.session_state.lat, st.session_state.lon]
+        location=[st.session_state.lat, st.session_state.lon],
+        zoom_start=11,
+        control_scale=True,
     )
 
     folium.Marker(
@@ -106,8 +108,12 @@ def draw_clickable_map() -> None:
         tooltip="Gewählter Ort",
     ).add_to(m)
 
-    st_folium(m, height=map_height, width=None, key="map")
-
+    st_folium(
+        m,
+        height=500,
+        use_container_width=True,  # ← ENTSCHEIDEND
+        key="map"
+    )
 
 # --- UI START ---
 set_background("davos.jpg")
@@ -128,8 +134,10 @@ st.selectbox(
     on_change=on_place_change,
 )
 
+
 # Karte
 st.subheader("Ort auf der Karte anklicken (Single-Click)")
+draw_clickable_map()
 
 # Forecast
 if st.button("❄️Schneevorhersage berechnen"):
