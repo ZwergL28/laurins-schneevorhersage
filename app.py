@@ -5,6 +5,9 @@ import folium
 from streamlit_folium import st_folium
 
 from snow_checker import load_forecast, to_table, will_it_snow_between
+from datetime import date
+
+today = date.today()
 
 st.set_page_config(
     page_title="Laurins Schneevorhersage",
@@ -125,8 +128,8 @@ st.title("Schneit es noch vor Weihnachten?")
 st.write("Wir prüfen die Wettervorhersage: Gibt es irgendwo Schneefall (> 0 cm) im gewählten Zeitraum?")
 
 # Zeitraum
-start_date = st.date_input("Startdatum", value=pd.to_datetime("2025-12-16").date())
-end_date = st.date_input("Enddatum", value=pd.to_datetime("2025-12-25").date())
+start_date = st.date_input("Startdatum", value=today)
+end_date = st.date_input("Enddatum", value=today)
 
 # Ort per Dropdown
 st.selectbox(
